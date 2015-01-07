@@ -88,15 +88,15 @@ routeBind = function() {
     for(var i=0;i<forms.length;i++) {
       var form = forms[i];
       if(!form._got_route) {
-        console.log('a',form);
+        //console.log('a',form);
         form.onsubmit = function() {
           var form = this;
-          console.log('b',form);
+          //console.log('b',form);
           var url = form.getAttribute("action");
           if(!url.contains("?")) {
             url += "?";
           }
-          console.log('c',url);
+          //console.log('c',url);
           var fields = document.querySelectorAll("input,select,textarea",form);
           console.log('d',fields);
           for(var i=0;i<fields.length;i++) {
@@ -120,9 +120,9 @@ routeBind = function() {
         var go=function() {
           var a = this;
           if(a.getAttribute('class') && a.getAttribute('class').contains('action')) {
-            execute(link.getAttribute("href"));
+            execute(a.getAttribute("href"));
           } else {
-            navigate(link.getAttribute("href"));
+            navigate(a.getAttribute("href"));
           }
           return false;
         };
