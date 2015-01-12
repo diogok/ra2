@@ -37,7 +37,7 @@ function app() {
     analysis(params.name,function(data){
         render('specie-tmpl',data).to('#content');
         chart(data);
-        map(data.occurrences);
+        map(data.points,{EOO: data.eoo_polygon, AOO: data.aoo_polygon});
         unloading();
     });
 
@@ -56,17 +56,37 @@ function app() {
       var qualityChart = new Chart(ctx).Radar(data, options);
     }
 
-    function map(occurrences) {
+    function map(occurrences,polis) {
       var div = document.createElement("div");
       div.setAttribute("id","map");
       document.getElementById('map-in').appendChild(div);
 
+      //var map = L.map('map',{crs:L.CRS.EPSG3857}).setView([51.505, -0.09], 1);
       var map = L.map('map').setView([51.505, -0.09], 1);
       L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
 
+      var land = L.tileLayer('http://{s}.tile3.opencyclemap.org/landscape/{z}/{x}/{y}.png')//.addTo(map);
+      var ocm = L.tileLayer('http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png').addTo(map);
+      var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png')//.addTo(map);
+
+      var base = { Landscape: land, OpenCycleMap: ocm, OpenStreetMap: osm };
+
+      var markers = new L.MarkerClusterGroup();
+
       for(var i=0;i<occurrences.length;i++) {
-        L.marker([occurrences[i].decimalLatitude, occurrences[i].decimalLongitude]).addTo(map);
+        markers.addLayer(L.marker([occurrences[i].decimalLatitude, occurrences[i].decimalLongitude]));
       }
+
+      var layers={Points: markers};
+
+      for(var i in polis) {
+        layers[i] = L.geoJson(polis[i]).addTo(map);
+      }
+
+      L.control.layers(base,layers).addTo(map);
+      L.control.scale().addTo(map);
+
+      map.addLayer(markers);
     };
   });
 
