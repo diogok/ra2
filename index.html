@@ -16,7 +16,6 @@
   <script src="js/reqwest.min.js" type="text/javascript"></script>
   <script src="js/router.js" type="text/javascript"></script>
   <script src="js/render.js" type="text/javascript"></script>
-  <script src="js/aoo.js" type="text/javascript"></script>
   <script src="js/analysis.js" type="text/javascript"></script>
   <script src="js/app.js" type="text/javascript"></script>
   <script src="js/leaflet.markercluster.js" type="text/javascript"></script>
@@ -106,6 +105,10 @@
             <td class='data'>{{criteria}}</td>
           </tr>
           <tr>
+            <td>Locations(# populations)</td>
+            <td class='data'>{{n_populations}}</td>
+          </tr>
+          <tr>
             <td>Occurrences</td>
             <td class='data'>{{count}}</td>
           </tr>
@@ -120,10 +123,6 @@
           <tr>
             <td>Extent of occurrence</td>
             <td class='data'>{{eoo}}km²</td>
-          </tr>
-          <tr>
-            <td>Locations</td>
-            <td class='data'>{{locations}}</td>
           </tr>
         </table>
       </div>

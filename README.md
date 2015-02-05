@@ -103,6 +103,17 @@ TBD. Much like the original idea on [iSpecies], by R.M.Page, we could also aggre
 
 Area of Occupancy (AO) is a frequently used indicator to assess and inform designation of conservation status to wildlife species by the International Union for Conservation of Nature (IUCN)[Jun Cheng, 2013]. We also take into account the number of locations.
 
+Categories:
+
+- NE
+- DD
+- LC
+- NT
+- VU
+- EN
+- CR
+- EW
+- EX
 
 From the IUCN Red List Categories and Criteria:
 
@@ -119,9 +130,12 @@ Criteria B
 -- Locations = 1 for CR
 -- Locations <= 5 for EN
 -- Locations <= 10 for VU
+-- AND one of (but we cant assess that)
+--- decline of population, eoo or aoo
+--- extreme fluctuation of population, eoo or aoo
 
 VU D2
-- AOO < 20km² or Locations <= 5
+- (AOO < 20km² OR Locations <= 5) AND a threat(but we cant assess threat)
 
 EOO calculation using minimum convex hull.
 AOO calculation using movable grid, of:
@@ -130,6 +144,10 @@ AOO calculation using movable grid, of:
 - 2km²
 - 5km²
 Number of locations using: ? (max dist + buffer + union when touch + count)
+
+### locations
+
+Originally proposed by Rapoport (1975), this method uses geo-referenced locality data. Locality points are interconnected to form an open, minimum spanning tree, where all points are connected by their shortest distance (Fig. 1A). Minimum distances between pairs of points are measured and the average distance (mean propinquity index) is calculated. This average figure is used as a radius to trace a circle around each point (Fig. 1B). The cumulative area of the circles (deducting overlapping fragments) is taken as the species distribution area. One advantage of the mean propinquity index is that it is derived from the characteristics of each particular species. In addition, this method allows to identify possible disjunctions.  According to Rapoport (1975) disjunctions are identified where the distance between two circles at their center is greater than twice the average distance.
 
 
 ## Future

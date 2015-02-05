@@ -7,12 +7,14 @@ function app() {
   });
 
   route("/search",function(params){
+    loading();
     render('search-tmpl',{}).to('#content');
 
     reqwest({
       url: gbif+'/species/suggest?rank=SPECIES&q='+encodeURIComponent(params.query)+'&callback=?',
       type: 'jsonp',
       success: function(data) {
+        unloading();
         document.querySelector("#result ul").innerHTML = "";
         for(var i=0;i<data.length;i++) {
           var name = data[i].canonicalName;
@@ -35,9 +37,10 @@ function app() {
     loading();
 
     analysis(params.name,function(data){
+        console.log(data);
         render('specie-tmpl',data).to('#content');
         chart(data);
-        map(data.points,{EOO: data.eoo_polygon, AOO: data.aoo_polygon});
+        map(data.points,{EOO: data.eoo_polygon, AOO: data.aoo_polygon, Populations: data.populations_polygon});
         unloading();
     });
 
@@ -80,6 +83,7 @@ function app() {
       var layers={Points: markers};
 
       for(var i in polis) {
+        console.log(i,polis[i]);
         layers[i] = L.geoJson(polis[i]).addTo(map);
       }
 
