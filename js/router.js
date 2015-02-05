@@ -98,7 +98,7 @@ routeBind = function() {
           }
           //console.log('c',url);
           var fields = document.querySelectorAll("input,select,textarea",form);
-          console.log('d',fields);
+          //console.log('d',fields);
           for(var i=0;i<fields.length;i++) {
             url += "&"+fields[i].getAttribute("name")+"="+encodeURIComponent(fields[i].value);
           }
