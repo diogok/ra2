@@ -1,7 +1,7 @@
 
 var dwcs='http://cncflora.jbrj.gov.br/dwc_services/api/v1';
 
-if(location.hostname =='localhost') dwcs='http://localhost:8080/api/v1';
+if(location.hostname =='localhost') dwcs='http://localhost:3000/api/v1';
 
 function analysis(name,fun) {
 
