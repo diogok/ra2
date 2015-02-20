@@ -2,13 +2,21 @@
 function render(tmpl,data){
   var t = document.getElementById(tmpl);
   var content = t.content.cloneNode(true);
+  var recontent="";
 
-  var els = content.querySelectorAll(".data");
-  for(var i=0;i<els.length;i++) {
-    for(var k in data) {
-      if(typeof data[k]=='string' || typeof data[k]=='number') {
-        var reg = new RegExp('{{'+k+'}}','g');
-        els[i].innerHTML = els[i].innerHTML.replace(reg,data[k]);
+  if(typeof Mustache == 'object') {
+    recontent= Mustache.render(t.innerHTML,data);
+    t = document.createElement("template");
+    t.innerHTML= recontent;
+    content = t.content.cloneNode(true);
+  } else {
+    var els = content.querySelectorAll(".data");
+    for(var i=0;i<els.length;i++) {
+      for(var k in data) {
+        if(typeof data[k]=='string' || typeof data[k]=='number') {
+          var reg = new RegExp('{{'+k+'}}','g');
+          els[i].innerHTML = els[i].innerHTML.replace(reg,data[k]);
+        }
       }
     }
   }
@@ -17,6 +25,8 @@ function render(tmpl,data){
 
   var r = {
     el: el,
+    content: content,
+    recontent: recontent,
     data: data,
     parent: null,
     to: function(element) {

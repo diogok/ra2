@@ -55,7 +55,7 @@ So:
 - Value-added: ?
 - Timeliness: A closely related concept is currency, which is interpreted as the time
 a data item has been stored (Wand and Wang, 1996)
-- Completeness
+- Completeness: "These charts illustrate changes in the number of records considered complete according to the definition above. Separate charts separately show the same information for specimen records and for observation records. Subsequent charts illustrate the component elements that affect the number of complete records." (http://www.gbif.org/analytics/global)
 - Amount of Data
 - Interpretability
 - Ease of understanding
@@ -63,15 +63,30 @@ a data item has been stored (Wand and Wang, 1996)
 - Consistent representation
 
 
-Alseo, following [Barros et al, 2014], "We have used the five-component scheme for assessing dataset quality".
+Also, following [Barros et al, 2014], "We have used the five-component scheme for assessing dataset quality".
 
 - Lineage
 - Completeness
 - Atrtribute accuracy
 - Logical Consistency
-- POsitional accuracy
+- Positional accuracy
 
+Therefore, te choosen metrics:
 
+- Amount of data: Quantity of data available.
+- Lineage: Currency.
+- Completeness: "A record is here defined to be complete if it includes an identification at least to species rank, valid coordinates, a full date of occurrence and a given basis of record"
+- Precision/Accuracy (geographic):
+- Consistency: 
+- Duplicates
+
+Actually, instead, let's focus on the data groups itself:
+
+- Identification
+- Localization
+- Abundance
+- Linage
+- 
 
 
 ### Protected areas

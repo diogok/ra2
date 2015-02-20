@@ -4,6 +4,10 @@ route = function(url,fun) {
     _routes[url] = fun;
 };
 
+if(!String.prototype.contains) {
+  String.prototype.contains = function(it) { return this.indexOf(it) != -1; };
+}
+
 function execute(url) {
     var parts = url.substring(1).split("?");
     var hash=parts[0];
@@ -20,7 +24,6 @@ function execute(url) {
         params[key]=decodeURIComponent( value );
     }
 
-    // TODO: deal with query strings
     for(var url in _routes) {
         var regex = RegExp("^"+url.replace(/:[^\/]+/g,"([^/]+)")+"$");
         var cap = hash.match(regex);
@@ -34,6 +37,7 @@ function execute(url) {
             }
             _routes[url](params);
             break;
+        } else {
         }
     }
 };
@@ -43,6 +47,10 @@ oldFn = window.onhashchange ;
 window.onhashchange = function() {
   var parts = location.hash.substring(1).split("?");
   var hash =parts[0];
+  if(hash==""||hash=="#"||hash=="/"||hash=="#/"){
+    hash="/index";
+  }
+
   var page =hash.substring(1).replace("_","-").replace(/\//g,"-")
   var html =document.querySelector("html");
 
@@ -119,7 +127,9 @@ routeBind = function() {
       if(!a._got_route) {
         var go=function() {
           var a = this;
-          if(a.getAttribute('class') && a.getAttribute('class').contains('action')) {
+          if(a.getAttribute("href").match(/^https?:\/\//) ) {
+            return true;
+          } else if(a.getAttribute('class') && a.getAttribute('class').contains('action')) {
             execute(a.getAttribute("href"));
           } else {
             navigate(a.getAttribute("href"));

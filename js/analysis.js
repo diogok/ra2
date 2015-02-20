@@ -1,37 +1,46 @@
 
 var dwcs='http://cncflora.jbrj.gov.br/dwc_services/api/v1';
-dwcs='http://localhost:3000/api/v1';
-var gbif="http://api.gbif.org/v1";
+
+if(location.hostname =='localhost') dwcs='http://localhost:3000/api/v1';
 
 function analysis(name,fun) {
 
   get_occurrences(name,function(occurrences) {
-      var points = occurrences.filter(function(a) {
-          return (typeof a.decimalLatitude == 'number' && typeof a.decimalLongitude == 'number');
-      });
+      get_analysis(occurrences,function(analysis){
+        data = analysis;
 
-      var to_calc  = points.map(function(occ) {
-          return {decimalLatitude: occ.decimalLatitude, decimalLongitude: occ.decimalLongitude};
-      });
+        data["name"] = name;
 
-      get_analysis(to_calc,function(analysis){
-        var data = {
-          name: name,
-          eoo: analysis.eoo.area.toLocaleString(),
-          aoo: analysis.aoo.area.toLocaleString(),
-          populations: analysis.populations.area.toLocaleString(),
-          n_populations: analysis.populations.n_populations,
-          eoo_polygon: analysis.eoo.polygon,
-          aoo_polygon: analysis.aoo.grid,
-          populations_polygon: analysis.populations.populations,
-          date: new Date().toLocaleString(),
-          count: occurrences.length,
-          count_points: points.length,
-          occurrences: occurrences,
-          points: points
-        };
+        data['risk-assessment'] = analysis['risk-assessment'][0];
+        data['risk-assessment'].date = new Date().toLocaleString();
 
-        fun(data);
+        data["category"] = data['risk-assessment']['category'];
+
+        for(var i in analysis) {
+          if(typeof analysis[i] == 'object') {
+            for(var k in analysis[i]) {
+              if(typeof analysis[i][k] == 'number') {
+                 //analysis[i][k] = analysis[i][k].toFixed(2).toLocaleString();
+              } else if(typeof analysis[i][k] == 'object') {
+                for(var o in analysis[i][k]) {
+                  if(typeof analysis[i][k][o] == 'number') {
+                    analysis[i][k][o] = analysis[i][k][o].toFixed(2).toLocaleString();
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        get_iucn(name,function(iucn){
+          if(iucn != null) {
+            data["risk-assessment"].iucn =iucn;
+          } else {
+            data["risk-assessment"].iucn = {category:'N/A'}
+          }
+          fun(data);
+        });
+
       });
 
     }
@@ -40,27 +49,14 @@ function analysis(name,fun) {
 
 function get_occurrences(name,fun,occs,offset) {
   var limit = 300;
-  if(typeof occs == 'undefined') {
-    occs = [];
-  }
-  if(typeof offset == 'undefined') {
-    offset = 0;
-  }
 
   reqwest({
-    url: gbif+'/occurrence/search?limit='+limit+'&scientificName='+encodeURIComponent(name)+'&offset='+offset,
+    url: dwcs+'/search/gbif?fixes=true&limit='+limit+'&field=scientificName&value='+encodeURIComponent(name),
     type: 'jsonp',
     success: function(resp) {
-      var result = occs.concat(resp.results);
-      if(resp.endOfRecords) {
-        fun(result);
-      } else {
-        //get_occurrences(name,fun,result,offset + limit);
-        fun(result);
-      }
+      fun(resp.results);
     }
   });
-
 };
 
 function clean(occs,fun) {
@@ -79,7 +75,6 @@ function clean(occs,fun) {
 
 
 function get_analysis(occs,fun) {
-
   reqwest({
     url: dwcs+'/analysis/all'
     , type: 'json'
@@ -91,8 +86,21 @@ function get_analysis(occs,fun) {
       fun(resp);
     }
   });
-
 };
 
-
+function get_iucn(name,fun) {
+  var url = "http://api.iucnredlist.org/index/species/"+encodeURIComponent(name.replace(" ","-"))+".js"
+  reqwest({
+    url: url
+    , type: 'jsonp'
+    , method: 'get'
+    , success: function(resp) {
+      if(resp[0]) {
+        fun(resp[0]);
+      } else {
+        fun(null);
+      }
+    }
+  });
+}
 

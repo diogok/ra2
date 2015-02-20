@@ -37,29 +37,51 @@ function app() {
     loading();
 
     analysis(params.name,function(data){
-        console.log(data);
         render('specie-tmpl',data).to('#content');
-        chart(data);
-        map(data.points,{EOO: data.eoo_polygon, AOO: data.aoo_polygon, Populations: data.populations_polygon});
+        chart(data.quality);
+        var layers = { };
+        for(var i in data) {
+          if(typeof data[i] == 'object') {
+            if(typeof data[i]['geo'] == 'object') {
+              //layers[i] = data[i]['geo'];
+            } else {
+              for(var k in data[i]) {
+                if(typeof data[i][k] == 'object' && typeof data[i][k]['geo'] == 'object') {
+                  layers[i+" "+k] = data[i][k]['geo'];
+                }
+              }
+            }
+          }
+        }
+        map(data.points.all,layers);
         unloading();
     });
 
-    function chart(occurrences) {
+    function chart(info) {
+      var labels = [];
+      var data   = [];
+
+      for(var l in info) {
+        labels.push(l);
+        data.push(info[l].toFixed(2));
+      }
+
       var ctx = document.getElementById("chart").getContext("2d");
       var options= {};
       var data   = {
-        labels: ["Precision","Completeness","Accuracy","Foo","Bar"],
+        labels: labels,
         datasets: [
           {
             label: "Data",
-            data:[50,20,30,40,10]
+            data: data
           }
+
         ]
       };
       var qualityChart = new Chart(ctx).Radar(data, options);
     }
 
-    function map(occurrences,polis) {
+    function map(occurrences,data) {
       var div = document.createElement("div");
       div.setAttribute("id","map");
       document.getElementById('map-in').appendChild(div);
@@ -75,22 +97,34 @@ function app() {
       var base = { Landscape: land, OpenCycleMap: ocm, OpenStreetMap: osm };
 
       var markers = new L.MarkerClusterGroup();
-
       for(var i=0;i<occurrences.length;i++) {
-        markers.addLayer(L.marker([occurrences[i].decimalLatitude, occurrences[i].decimalLongitude]));
+        var m = L.marker([occurrences[i].decimalLatitude, occurrences[i].decimalLongitude]);
+        /* // TOO BIG!
+        var html = "<table>";
+        for(var k in occurrences[i]) {
+          html += "<tr><td>"+k+"</td><td>"+occurrences[i][k]+"</td></tr>";
+        }
+        html += "</table>";
+        m.bindPopup(html);
+        */
+        (function(occ,m) {
+          m.on('click',function(e){
+            console.log("clicked occurrence:",occ);
+          });
+        })(occurrences[i],m);
+        markers.addLayer(m);
       }
+      map.addLayer(markers);
 
-      var layers={Points: markers};
+      var layers={};
 
-      for(var i in polis) {
-        console.log(i,polis[i]);
-        layers[i] = L.geoJson(polis[i]).addTo(map);
+      for(var i in data) {
+        layers[i] = L.geoJson(data[i]).addTo(map);
       }
 
       L.control.layers(base,layers).addTo(map);
       L.control.scale().addTo(map);
 
-      map.addLayer(markers);
     };
   });
 
