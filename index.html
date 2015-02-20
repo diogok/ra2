@@ -10,6 +10,8 @@
   <link rel="stylesheet" href="css/MarkerCluster.Default.css" />
   <link rel="stylesheet" href="css/app.css" />
 
+  <link rel="shortcut icon" href="favicon.ico" />
+
   <script src="//cdn.leafletjs.com/leaflet-0.7.3/leaflet.js" type="text/javascript"></script>
   <script src="//cdn.jsdelivr.net/chart.js/1.0.1-beta.4/Chart.min.js" type="text/javascript"></script>
   <script src="//cdn.jsdelivr.net/mustache.js/0.8.1/mustache.min.js" type="text/javascript"></script>
@@ -40,34 +42,177 @@
 
   <footer>
     <div class='content'>
-      <p>Lorem ipsum, dolor sit amet. <a href='#'>Yadayada</a> stuff explained here.</p>
-
+      <p>Created for (but not only) the <a href='http://gbif.challengepost.com/'>GBIF Ebbe Nielsen Challenge 2015</a>, 
+        and made <a href='http://github.com/diogok/ra2' class='fa fa-github'> open-source</a>, 
+        by <a href='http://diogok.net'>Diogo Silva</a>.</p>
+      <p>Data sources:</p>
       <ul>
-        <li><a href="">GBIF</a>: Dadada tataa</li>
-        <li><a href="">CNCFlora</a>: Lorem lorem</li>
-        <li><a href="">Flora do Brasil</a>: Tchuca Tchuca</li>
+        <li><a href="http://gbif.org">GBIF</a></li>
+        <li><a href="http://iucnredlist.org">IUCN</a></li>
       </ul>
     </div>
   </footer>
 
   <template id="index-tmpl">
-    <form action="/search" class='pure-form pure-g content' id='search'>
-      <fieldset class='pure-u-1'>
-        <legend class='pure-u-1'>
-          <strong>
-            Search for a specie name:
-          </strong>
-        </legend>
-        <div class='pure-u-22-24'>
-          <input id="query" name="query" type="text" placeholder='Caesalpinia echinata' class='pure-input-1'/>
-        </div>
-        <div class='pure-u-1-24'>
-          <button type='submit' class='pure-button pure-input-1 button-success fa fa-search'></button>
-        </div>
-      </fieldset>
-    </form>
-    <div>
-      <p></p>
+    <div class='pure-g content'>
+
+      <form action="/search" class='pure-form pure-u-1' id='search'>
+        <fieldset>
+          <h3> Search for a specie name</h3>
+          <div class='pure-u-22-24'>
+            <input id="query" name="query" type="text" placeholder='Justicia boliviana' class='pure-input-1'/>
+          </div>
+          <div class='pure-u-1-24'>
+            <button type='submit' class='pure-button pure-input-1 button-success fa fa-search'></button>
+          </div>
+        </fieldset>
+      </form>
+
+      <div class='pure-u-1'>
+
+        <section>
+          <h3>Rationale</h3>
+          <article>
+            <p>Prioritizing conservation efforts has become one of the most crucial steps in preserving biodiversity (Hoffmann et al. 2010; Keith et al. 2004; Mace et al. 2008; Miller et al. 2007).</p>
+            <p>Here is tested a method to rapidly assess extinction risk for any specie(rapid assessment), following a simplified geospatial criteria of the IUCN methodology,
+            exposing the used data and calculations, and assumed quality, so it can be reviewed and reapplied by specialists if given better resources.</p>
+            <p>Rapid automated risk assessment must take in account the bad quality of data in biodiversity datasets, but this quality can be measured and therefore will be displayed along with the risk assessment. This measure is important to avid the kind of decision that could be wrongly taken, as exposed by [Chapman, 2005]. </p>
+            <p>Used here is a Pragmatic Information Quality measure [E.Dalcin, 2005], where it is taken into account the usefulness of the data. There are too many metrics that one could apply, but I focused on the ones that seen more relevant to the geographic distribution of occurrences and could be fully automated. </p>
+          </article>
+        </section>
+
+        <section>
+          <h3>Analysis of completeness and quality of occurrences</h3>
+          <p>Theses area mainly quantitative analysis of completeness of data.
+            This helps to indicate how appropriate (or not) this assessment is for this specie.
+            Each metric is graded from 0 to 5 for each record of occurrence, and them divided by the occurrence count
+            to provide the overral metric.</p>
+          <article>
+            <h4>Abundance</h4>
+            <p>If the quantity of records is enough for an assessment.</p>
+          </article>
+          <article>
+            <h4>Identification</h4>
+            <p>If the record is fully identified. Accounts for occurrenceID, collector information, identification information, taxonomy and dates.</p>
+          </article>
+          <article>
+            <h4>Georeference</h4>
+            <p>If the record is well georeferencied. Accounts for valid coordinates, with precision and datum specified, textual description of location, country, state and municipality.
+               Unfortunally we do not test the accuracy of the information provided.</p>
+          </article>
+          <article>
+            <h4>Linage</h4>
+            <p>Accounts for the currency of the record, be it the actual collecting date of the last time this record was reviewed.</p>
+          </article>
+        </section>
+
+        <section>
+          <h3>Analysis of specie distribution</h3>
+          <p>Performed for historic (older then 50 years), current and all of occurrences.</p>
+          <article>
+            <h4>Country distribution</h4>
+            <p>Lists the countries in which the species occur, 
+              and allows to filter the data and perform the analysis on this country data only.</p>
+          </article>
+          <article>
+            <h4>Extent of occurrences</h4>
+            <p>Utilizes a convex-hull method to calculate the total extent of occurrence for the specie.</p>
+          </article>
+          <article>
+            <h4>Area of Occupancy (AOO)</h4>
+            <p>Using a world grid of 2km of side, and matching those which have occurrences on it, 
+               distincts them to calculate the area of occupancy of the specie.</p>
+          </article>
+          <article>
+            <h4>Population clusters</h4>
+            <p>Based on 10% of the maximum distance between the species occurrences (to be changed to a minimum-spaning-tree following Rapoport's approach), draws a bufer of this radius around them
+               and groups those that intersects.</p>
+          </article>
+        </section>
+
+        <section class='assess-info'>
+          <h3>Risk Assessment Analysis</h3>
+          <p>Using IUCN category and criteria extinction risk assessment, but based only on geographical distribution and futher simplified.</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Value</th>
+                <th>Category (criteria)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Number of records</td>
+                <td> &lt; 3</td>
+                <td>DD</td>
+              </tr>
+              <tr>
+                <td>Area of occupancy</td>
+                <td> &lt; 10km²</td>
+                <td>CR (B2)</td>
+              </tr>
+              <tr>
+                <td>Area of occupancy</td>
+                <td> &lt; 500km²</td>
+                <td>EN (B2)</td>
+              </tr>
+              <tr>
+                <td>Area of occupancy</td>
+                <td> &lt; 2000km²</td>
+                <td>VU (B2)</td>
+              </tr>
+              <tr>
+                <td>Extent of occurrence</td>
+                <td> &lt; 100km²</td>
+                <td>CR (B1)</td>
+              </tr>
+              <tr>
+                <td>Extent of occurrence</td>
+                <td> &lt; 5000km²</td>
+                <td>EN (B1)</td>
+              </tr>
+              <tr>
+                <td>Extent of occurrence</td>
+                <td> &lt; 20000km²</td>
+                <td>VU (B1)</td>
+              </tr>
+            </tbody>
+          </table>
+          <p> Due to lack of a method for some extra information (specially locations and threats), the categories had to be simplified.
+              The methodology can be improved if we have easy access to such data. </p>
+        </section>
+
+        <section>
+          <article>
+            <h3>Limitations and improvements</h3>
+            <p>
+              <strong>Occurrence loading</strong>:
+                This service is using the GBIF search API to load occurrences, 
+                so this is loading only 1200 records, which is already 4 requests, due to time constraints.
+                To improve this, one could timely use the download service(maybe by family) to preload all data.
+                This would cost both bandwidth to download the resources and harddrive to store the results.
+            </p>
+            <p>
+              <strong>Calculation of 1000 records</strong>:
+              Due to limited hardware, the service only use 1000 records for distribution analysis, which can already take up to 2 minutes 
+              (depends more on range of distribution then on count) on commodity hardware.
+              Faster algorithms and distribuited workloads could remove this limitation.
+            </p>
+            <p>
+              <strong>More data</strong>:
+              Data of protected areas and threats should also be present. 
+              A starting point would be the <a href='http://globalforestwatch.org/sources/conservation'>Global Forest Watch</a> sources.
+            </p>
+            <p>
+              <strong>Methodology</strong>:
+              The clustering method must be improved to use average distance from a MST (Rapoport's method). 
+              A methodology for defining locations must be implemented.
+              How the IUCN categories are applied should be reviewed.
+            </p>
+          </article>
+        </section>
+      </div>
     </div>
   </template>
 
@@ -95,14 +240,10 @@
 
       <h2 class='pure-u-1'>
         <i>{{name}}</i>
-        <span class="category EN data">{{category}}</span>
+        <span class="category {{category}} data">{{category}}</span>
       </h2>
 
       <div class=''>
-        {{#limited}}
-        <p class='pure-u-1'>Limited to {{limit}} occurrences.</p>
-        {{/limited}}
-        <p class='pure-u-1'>Analysis may be limited to 300 occurrences due to limited resources/server time.</p>
 
         {{#risk-assessment}}
         <section class='pure-u-1-2'>
@@ -152,6 +293,9 @@
         </section>
 
         <h3 class='pure-u-1'>Distribution</h3>
+        {{#limited}}
+        <p class='pure-u-1'>Limited to {{limit}} occurrences.</p>
+        {{/limited}}
 
         <section class='pure-u-1-3'>
           <h4>All occurrences</h4>

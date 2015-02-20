@@ -37,6 +37,11 @@ function app() {
     loading();
 
     analysis(params.name,function(data){
+        if(!data){
+          unloading();
+          location.hash="#/index";
+          return;
+        }
         render('specie-tmpl',data).to('#content');
         chart(data.quality);
         var layers = { };

@@ -1,54 +1,58 @@
 
 var dwcs='http://cncflora.jbrj.gov.br/dwc_services/api/v1';
 
-if(location.hostname =='localhost') dwcs='http://localhost:3000/api/v1';
+if(location.hostname =='localhost') dwcs='http://localhost:8080/api/v1';
 
 function analysis(name,fun) {
 
   get_occurrences(name,function(occurrences) {
-      get_analysis(occurrences,function(analysis){
-        data = analysis;
+      if(occurrences.length < 1000 || confirm("This species have more than 1000 ocurrences, some calculations may be limited and take up to two minutes.")) {
+        get_analysis(occurrences,function(analysis){
+          data = analysis;
 
-        data["name"] = name;
+          data["name"] = name;
 
-        data['risk-assessment'] = analysis['risk-assessment'][0];
-        data['risk-assessment'].date = new Date().toLocaleString();
+          data['risk-assessment'] = analysis['risk-assessment'][0];
+          data['risk-assessment'].date = new Date().toLocaleString();
 
-        data["category"] = data['risk-assessment']['category'];
+          data["category"] = data['risk-assessment']['category'];
 
-        for(var i in analysis) {
-          if(typeof analysis[i] == 'object') {
-            for(var k in analysis[i]) {
-              if(typeof analysis[i][k] == 'number') {
-                 //analysis[i][k] = analysis[i][k].toFixed(2).toLocaleString();
-              } else if(typeof analysis[i][k] == 'object') {
-                for(var o in analysis[i][k]) {
-                  if(typeof analysis[i][k][o] == 'number') {
-                    analysis[i][k][o] = analysis[i][k][o].toFixed(2).toLocaleString();
+          for(var i in analysis) {
+            if(typeof analysis[i] == 'object') {
+              for(var k in analysis[i]) {
+                if(typeof analysis[i][k] == 'number') {
+                   //analysis[i][k] = analysis[i][k].toFixed(2).toLocaleString();
+                } else if(typeof analysis[i][k] == 'object') {
+                  for(var o in analysis[i][k]) {
+                    if(typeof analysis[i][k][o] == 'number') {
+                      analysis[i][k][o] = analysis[i][k][o].toFixed(2).toLocaleString();
+                    }
                   }
                 }
               }
             }
           }
-        }
 
-        get_iucn(name,function(iucn){
-          if(iucn != null) {
-            data["risk-assessment"].iucn =iucn;
-          } else {
-            data["risk-assessment"].iucn = {category:'N/A'}
-          }
-          fun(data);
+          get_iucn(name,function(iucn){
+            if(iucn != null) {
+              data["risk-assessment"].iucn =iucn;
+            } else {
+              data["risk-assessment"].iucn = {category:'N/A'}
+            }
+            fun(data);
+          });
+
         });
-
-      });
-
+      } else {
+        fun(false);
+      }
     }
   );
 }
 
 function get_occurrences(name,fun,occs,offset) {
-  var limit = 300;
+  var limit = 1200;
+  //if(location.hostname=='localhost') limit=300;
 
   reqwest({
     url: dwcs+'/search/gbif?fixes=true&limit='+limit+'&field=scientificName&value='+encodeURIComponent(name),

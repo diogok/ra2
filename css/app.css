@@ -78,7 +78,7 @@ a, a:link, a:visited, a:active {
 
 #content {
    min-height: 80vh;
-   padding-bottom: 50px;
+   padding-bottom: 20px;
 }
 
 form#search {
@@ -97,9 +97,35 @@ form#search button {
   padding: 12px 10px 12px 10px;
 }
 
+.EX,.EW {
+  background-color: #000;
+}
+
+.CR {
+  background-color: #811;
+}
+
 .EN {
+  background-color: #C55;
+}
+
+.VU {
   background-color: #A33;
 }
+
+.NT {
+  background-color: #33A;
+}
+
+.LC {
+  background-color: #3A3;
+}
+
+.DD {
+  background-color: #999;
+}
+
+
 
 table {
   font-size: 16px;
@@ -114,6 +140,13 @@ table tr td:first-child {
   height: 80vh;
 }
 
+.assess-info td, .assess-info th {
+  text-align: left;
+  border: 1px #ccc solid;
+  padding: 10px;
+}
+
 /* pure buttons */
 .button-success, .button-error, .button-warning, .button-secondary { color: white; border-radius: 4px; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); } .button-success { background: rgb(28, 184, 65); /* this is a green */ } .button-error { background: rgb(202, 60, 60); /* this is a maroon */ } .button-warning { background: rgb(223, 117, 20); /* this is an orange */ } .button-secondary { background: rgb(66, 184, 221); /* this is a light blue */ }
+
 
