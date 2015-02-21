@@ -4,6 +4,8 @@ This a simple HTML interface to show diverse analysis focusing on providing a Ri
 
 It utilizes the [DarwinCore Services](http://github.com/diogok/dwc-services) and [GBIF](http://gbif.org) data.
 
+[Check it out](http://diogok.net/ra2)!
+
 ## License
 
 MIT
