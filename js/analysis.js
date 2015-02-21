@@ -1,5 +1,5 @@
 
-var dwcs='http://cncflora.jbrj.gov.br/dwc_services/api/v1';
+var dwcs='http://dwc-01-1.diogok.cont.tutum.io:8080/api/v1';
 
 var limit = (20 * 300);
 
