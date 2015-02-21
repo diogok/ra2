@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Rapid Automated Risk Assessment of the whole world</title>
   <link rel="stylesheet" href="//yui.yahooapis.com/pure/0.5.0/pure-min.css">
+  <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css">
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="//cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
   <link rel="stylesheet" href="css/MarkerCluster.css" />
@@ -77,7 +78,11 @@
             <p>Here is tested a method to rapidly assess extinction risk for any specie(rapid assessment), following a simplified geospatial criteria of the IUCN methodology,
             exposing the used data and calculations, and assumed quality, so it can be reviewed and reapplied by specialists if given better resources.</p>
             <p>Rapid automated risk assessment must take in account the bad quality of data in biodiversity datasets, but this quality can be measured and therefore will be displayed along with the risk assessment. This measure is important to avid the kind of decision that could be wrongly taken, as exposed by [Chapman, 2005]. </p>
-            <p>Used here is a Pragmatic Information Quality measure [E.Dalcin, 2005], where it is taken into account the usefulness of the data. There are too many metrics that one could apply, but I focused on the ones that seen more relevant to the geographic distribution of occurrences and could be fully automated. </p>
+            <p>
+            <!--
+            Used here is a Pragmatic Information Quality measure [E.Dalcin, 2005], where it is taken into account the usefulness of the data.
+            -->
+            There are too many metrics that one could apply, but I focused on the ones that seen more relevant to the geographic distribution of occurrences and could be fully automated. </p>
           </article>
         </section>
 
@@ -109,11 +114,13 @@
         <section>
           <h3>Analysis of specie distribution</h3>
           <p>Performed for historic (older then 50 years), current and all of occurrences.</p>
+          <!--
           <article>
             <h4>Country distribution</h4>
             <p>Lists the countries in which the species occur, 
               and allows to filter the data and perform the analysis on this country data only.</p>
           </article>
+          -->
           <article>
             <h4>Extent of occurrences</h4>
             <p>Utilizes a convex-hull method to calculate the total extent of occurrence for the specie.</p>
@@ -189,15 +196,19 @@
             <p>
               <strong>Occurrence loading</strong>:
                 This service is using the GBIF search API to load occurrences, 
-                so this is loading only 1200 records, which is already 4 requests, due to time constraints.
+                so this is loading only 6000 records, which is already 20 requests, 
+                with circa 3MB payload and 12MB of analysis data.
                 To improve this, one could timely use the download service(maybe by family) to preload all data.
                 This would cost both bandwidth to download the resources and harddrive to store the results.
+                Such would allow also agregated statistics.
             </p>
             <p>
-              <strong>Calculation of 1000 records</strong>:
-              Due to limited hardware, the service only use 1000 records for distribution analysis, which can already take up to 2 minutes 
+              <strong>Calculation of 10000 records</strong>:
+              Due to limited hardware, the service only use 10000 records for distribution analysis, which can already take up to a minute 
               (depends more on range of distribution then on count) on commodity hardware.
               Faster algorithms and distribuited workloads could remove this limitation.
+              Some limitation would still be OK, since the greater range of occurrence (and occurrence count) 
+              the smaller the chance for it to be in risk. But still, the greater the limit the better.
             </p>
             <p>
               <strong>More data</strong>:
@@ -245,8 +256,7 @@
 
       <div class=''>
 
-        {{#risk-assessment}}
-        <section class='pure-u-1-2'>
+        <section class='pure-u-1 pure-u-md-1-2'>
           <h3>Assessment</h3>
           <table>
             <tr>
@@ -267,14 +277,13 @@
             </tr>
           </table>
         </section>
-        {{/risk-assessment}}
 
-        <section id="quality" class="pure-u-1-2">
+        <section id="quality" class="pure-u-1 pure-u-md-1-2">
           <h3>Completeness and Quality</h3>
           <canvas id="chart"></canvas>
         </section>
 
-        <section class='pure-u-1-2'>
+        <section class='pure-u-1 pure-md-u-1-2'>
           <h3>Occurrences <small>(georeference/total)</small> </h3>
           <table>
             <tr>
@@ -297,7 +306,7 @@
         <p class='pure-u-1'>Limited to {{limit}} occurrences.</p>
         {{/limited}}
 
-        <section class='pure-u-1-3'>
+        <section class='pure-u-1 pure-u-md-1-3'>
           <h4>All occurrences</h4>
           <table>
             <tr>
@@ -319,7 +328,7 @@
           </table>
         </section>
 
-        <section class='pure-u-1-3'>
+        <section class='pure-u-1 pure-u-md-1-3'>
           <h4>Recent only</h4>
           <table>
             <tr>
@@ -341,7 +350,7 @@
           </table>
         </section>
 
-        <section class='pure-u-1-3'>
+        <section class='pure-u-1 pure-u-md-1-3'>
           <h4>Historic only</h4>
           <table>
             <tr>

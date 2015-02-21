@@ -1,12 +1,14 @@
 
 var dwcs='http://cncflora.jbrj.gov.br/dwc_services/api/v1';
 
+var limit = (20 * 300);
+
 if(location.hostname =='localhost') dwcs='http://localhost:3000/api/v1';
 
 function analysis(name,fun) {
 
   get_occurrences(name,function(occurrences) {
-      if(occurrences.length < 1000 || confirm("This species have more than 1000 ocurrences, some calculations may be limited and take up to two minutes.")) {
+      if(occurrences.length < limit || confirm("This species have more than "+limit+" ocurrences, some calculations may be limited and take up to a minute.")) {
         get_analysis(occurrences,function(analysis){
           data = analysis;
 
@@ -51,7 +53,6 @@ function analysis(name,fun) {
 }
 
 function get_occurrences(name,fun,occs,offset) {
-  var limit = 1200;
   //if(location.hostname=='localhost') limit=300;
 
   reqwest({

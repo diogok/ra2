@@ -58,7 +58,7 @@ function app() {
             }
           }
         }
-        map(data.points.all,layers);
+        map(data.points.geo.features,layers);
         unloading();
     });
 
@@ -103,7 +103,7 @@ function app() {
 
       var markers = new L.MarkerClusterGroup();
       for(var i=0;i<occurrences.length;i++) {
-        var m = L.marker([occurrences[i].decimalLatitude, occurrences[i].decimalLongitude]);
+        var m = L.marker([occurrences[i].geometry.coordinates[1], occurrences[i].geometry.coordinates[0]]);
         /* // TOO BIG!
         var html = "<table>";
         for(var k in occurrences[i]) {
