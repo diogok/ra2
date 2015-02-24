@@ -2,8 +2,24 @@
 function app() {
   var gbif="http://api.gbif.org/v1";
 
+  var occs=null;
+
   route("/index",function() {
     render('index-tmpl',{}).to('#content');
+
+    file_loader('#dropfile',function(files){
+      loading();
+      default_loader(files);
+      var all = [];
+      for(var f=0;f<files.length;f++) {
+        for(var i=0;i<files[f].data.length;i++) {
+          all.push(files[f].data[i]);
+        }
+      }
+      navigate("#/specie?upload=true");
+      occs=all;
+      unloading();
+    },true);
   });
 
   route("/search",function(params){
@@ -36,22 +52,29 @@ function app() {
   route("/specie",function(params){
     loading();
 
-    analysis(params.name,function(data){
+    if(typeof params.name == 'string') {
+      analysis_by_name(params.name,loaded);
+    } else if(typeof params.upload == 'string'){
+      params.name='User submitted';
+      analysis_by_data(occs,loaded);
+    }
+
+    function loaded(data){
+      console.log(data);
         if(!data){
           unloading();
           location.hash="#/index";
           return;
         }
         render('specie-tmpl',data).to('#content');
-        chart(data.quality);
         var layers = { };
         for(var i in data) {
-          if(typeof data[i] == 'object') {
+          if(typeof data[i] == 'object' && data[i] != null) {
             if(typeof data[i]['geo'] == 'object') {
               //layers[i] = data[i]['geo'];
             } else {
               for(var k in data[i]) {
-                if(typeof data[i][k] == 'object' && typeof data[i][k]['geo'] == 'object') {
+                if(typeof data[i][k] == 'object' && typeof data[i][k]['geo'] == 'object' && data[i][k]['geo'] != null) {
                   layers[i+" "+k] = data[i][k]['geo'];
                 }
               }
@@ -59,32 +82,9 @@ function app() {
           }
         }
         map(data.points.geo.features,layers);
+        charts(data);
         unloading();
-    });
-
-    function chart(info) {
-      var labels = [];
-      var data   = [];
-
-      for(var l in info) {
-        labels.push(l);
-        data.push(info[l].toFixed(2));
-      }
-
-      var ctx = document.getElementById("chart").getContext("2d");
-      var options= {};
-      var data   = {
-        labels: labels,
-        datasets: [
-          {
-            label: "Data",
-            data: data
-          }
-
-        ]
-      };
-      var qualityChart = new Chart(ctx).Radar(data, options);
-    }
+    };
 
     function map(occurrences,data) {
       var div = document.createElement("div");
@@ -104,14 +104,6 @@ function app() {
       var markers = new L.MarkerClusterGroup();
       for(var i=0;i<occurrences.length;i++) {
         var m = L.marker([occurrences[i].geometry.coordinates[1], occurrences[i].geometry.coordinates[0]]);
-        /* // TOO BIG!
-        var html = "<table>";
-        for(var k in occurrences[i]) {
-          html += "<tr><td>"+k+"</td><td>"+occurrences[i][k]+"</td></tr>";
-        }
-        html += "</table>";
-        m.bindPopup(html);
-        */
         (function(occ,m) {
           m.on('click',function(e){
             console.log("clicked occurrence:",occ);
@@ -121,7 +113,7 @@ function app() {
       }
       map.addLayer(markers);
 
-      var layers={};
+      var layers={'All Points':markers};
 
       for(var i in data) {
         layers[i] = L.geoJson(data[i]).addTo(map);

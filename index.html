@@ -19,12 +19,16 @@
   <script src="//cdn.leafletjs.com/leaflet-0.7.3/leaflet.js" type="text/javascript"></script>
   <script src="//cdn.jsdelivr.net/chart.js/1.0.1-beta.4/Chart.min.js" type="text/javascript"></script>
   <script src="//cdn.jsdelivr.net/mustache.js/0.8.1/mustache.min.js" type="text/javascript"></script>
+  <script src="//cdn.jsdelivr.net/papaparse/4.1.0/papaparse.min.js" type="text/javascript"></script>
 
   <script src="js/reqwest.min.js" type="text/javascript"></script>
+  <script src="js/Chart.StackedBar.js" type="text/javascript"></script>
+  <script src="js/fileloader.js" type="text/javascript"></script>
 
   <script src="js/router.js" type="text/javascript"></script>
   <script src="js/render.js" type="text/javascript"></script>
   <script src="js/analysis.js" type="text/javascript"></script>
+  <script src="js/charts.js" type="text/javascript"></script>
   <script src="js/app.js" type="text/javascript"></script>
   <script src="js/leaflet.markercluster.js" type="text/javascript"></script>
   <script type="text/javascript">
@@ -60,17 +64,26 @@
   <template id="index-tmpl">
     <div class='pure-g content'>
 
-      <form action="/search" class='pure-form pure-u-1' id='search'>
-        <fieldset>
-          <h3> Search for a specie name</h3>
-          <div class='pure-u-22-24'>
-            <input id="query" name="query" type="text" placeholder='Justicia boliviana' class='pure-input-1'/>
-          </div>
-          <div class='pure-u-1-24'>
-            <button type='submit' class='pure-button pure-input-1 button-success fa fa-search'></button>
-          </div>
-        </fieldset>
-      </form>
+      <div class='pure-u-1 pure-u-md-1-2'>
+        <h3> Search for a specie name</h3>
+        <form action="/search" class='pure-form' id='search'>
+          <fieldset>
+            <div class='pure-u-21-24'>
+              <input id="query" name="query" type="text" placeholder='Justicia boliviana' class='pure-input-1'/>
+            </div>
+            <div class='pure-u-2-24'>
+              <button type='submit' class='pure-button pure-input-1 button-success fa fa-search'></button>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+
+      <div class='pure-u-1 pure-u-md-1-2'> 
+        <h3>Select or Drop some DwC <strong>CSV, JSON or GeoJSON</strong>.</h3>
+        <div id="dropfile" >
+          <span class="fa fa-3x fa-cloud-upload"></span>
+        </div>
+      </div>
 
       <div class='pure-u-1'>
 
@@ -200,7 +213,7 @@
               <strong>Occurrence loading</strong>:
                 This service is using the GBIF search API to load occurrences, 
                 so this is loading only 6000 records, which is already 20 requests, 
-                with circa 3MB payload and 12MB of analysis data.
+                with circa 3MB payload and 5MB of analysis data, that results in 1MB download to client due to compression.
                 To improve this, one could timely use the download service(maybe by family) to preload all data.
                 This would cost both bandwidth to download the resources and harddrive to store the results.
                 Such would allow also agregated statistics.
@@ -283,12 +296,16 @@
         </section>
         {{/risk-assessment}}
 
-        <section id="quality" class="pure-u-1 pure-u-md-1-2">
-          <h3>Completeness and Quality</h3>
-          <canvas id="chart"></canvas>
+        <section id="quality-summary" class="pure-u-1 pure-u-md-1-2">
+          <h3>Completeness and quality summary</h3>
+          <canvas></canvas>
         </section>
 
-        <section class='pure-u-1 pure-md-u-1-2'>
+        <section id="quality-details" class="pure-u-1">
+          <h3>Completeness and quality details</h3>
+        </section>
+
+        <section class='pure-u-1 pure-u-md-1-2'>
           <h3>Occurrences <small>(georeference/total)</small> </h3>
           <table>
             <tr>
@@ -306,6 +323,11 @@
           </table>
         </section>
 
+        <section id="occs-chart" class="pure-u-1 pure-u-md-1-2">
+          <h3>Occurrences <small>(georeference/total)</small> </h3>
+          <canvas></canvas>
+        </section>
+
         <h3 class='pure-u-1'>Distribution</h3>
         {{#limited}}
         <p class='pure-u-1'>Limited to {{limit}} occurrences.</p>
@@ -314,6 +336,14 @@
         <section class='pure-u-1 pure-u-md-1-3'>
           <h4>All occurrences</h4>
           <table>
+            <tr>
+              <td>Occurrences</td>
+              <td>{{occurrences.count}}</td>
+            </tr>
+            <tr>
+              <td>Points</td>
+              <td>{{points.count}}</td>
+            </tr>
             <tr>
               <td>Extent of occurrence</td>
               <td>{{eoo.all.area}}km²</td>
@@ -337,6 +367,14 @@
           <h4>Recent only</h4>
           <table>
             <tr>
+              <td>Occurrences</td>
+              <td>{{occurrences.count_recent}}</td>
+            </tr>
+            <tr>
+              <td>Points</td>
+              <td>{{points.count_recent}}</td>
+            </tr>
+            <tr>
               <td>Extent of occurrence</td>
               <td>{{eoo.recent.area}}km²</td>
             </tr>
@@ -358,6 +396,14 @@
         <section class='pure-u-1 pure-u-md-1-3'>
           <h4>Historic only</h4>
           <table>
+            <tr>
+              <td>Occurrences</td>
+              <td>{{occurrences.count_historic}}</td>
+            </tr>
+            <tr>
+              <td>Points</td>
+              <td>{{points.count_historic}}</td>
+            </tr>
             <tr>
               <td>Extent of occurrence</td>
               <td>{{eoo.historic.area}}km²</td>
